@@ -1,0 +1,237 @@
+<html>
+
+
+<script src="pamMatrix.js"></script>
+
+<body>
+   <center>
+      <canvas id="thisCanvas" width="500" height="500"></canvas>
+
+   </center>
+</body>
+
+
+<script>
+   var pi = Math.PI;
+   var tau = 2 * Math.PI;
+
+   var matrix = new Matrix;
+   matrix.init();
+
+   var canvas;
+   var context, width, height;
+
+   var srcPt = new Vector3;
+   var destPt = new Vector3;
+   var transformedPt = new Vector3;
+
+
+
+      // startLine
+      var startLine = function(x, y, z){
+               context.beginPath();
+
+            srcPt.set(x,y,z);
+            matrix.transform(srcPt, destPt);
+            destPt.viewportTransform(width, height, transformedPt );
+            context.moveTo(transformedPt.x, transformedPt.y);
+
+
+      }
+
+      // lineTo
+      var lineTo = function(x, y, z){
+            srcPt.set(x,y,z);
+            matrix.transform(srcPt, destPt);
+            destPt.viewportTransform(width, height, transformedPt );
+            context.lineTo(transformedPt.x, transformedPt.y);
+            //console.log(context);
+
+
+      }
+
+            // lineTo
+      var tackText = function(txt,x, y, z){
+            srcPt.set(x,y,z);
+            matrix.transform(srcPt, destPt);
+            destPt.viewportTransform(width, height, transformedPt );
+            context.font = "24px Arial";
+            context.fillText(txt.toString(), transformedPt.x, transformedPt.y);
+
+
+      }
+
+
+   canvas = initCanvas('thisCanvas');
+   canvas.update = function(_context){
+      matrix.init();
+
+      context = _context;
+      width = canvas.width;
+      height = canvas.height;
+
+      ////border
+
+      context.lineWidth = 1;
+      context.strokeStyle = 'black';
+      context.beginPath();
+      context.moveTo(0,0);
+      context.lineTo(width, 0);
+      context.lineTo(width, height);
+      context.lineTo(0, height);
+      context.lineTo(0, 0);
+      context.stroke();
+
+     
+         var square = function(){
+
+         var vertices = [  [-0.5, 0.5, 0],
+                           [0.5, 0.5, 0],
+                           [0.5, -0.5, 0],
+                           [-0.5, -0.5, 0]
+                        ]; 
+
+         var edges= [   [0,1],
+                        [1,2],
+                        [2,3],
+                        [3,0]
+                              ];
+
+         for( var i =0; i < edges.length; i++){ 
+
+               startLine(vertices[edges[i][0]][0],vertices[edges[i][0]][1], vertices[edges[i][0]][2]);
+               lineTo(vertices[edges[i][1]][0],vertices[edges[i][1]][1], vertices[edges[i][1]][2]);
+
+               tackText("🖕",vertices[edges[i][1]][0],vertices[edges[i][1]][1], vertices[edges[i][1]][2] );
+               context.stroke(); 
+
+            
+         }
+
+
+
+
+
+
+      }
+
+
+//
+
+            context.font = "40px Arial";
+
+            //matrix.rotateY(3*Math.sin(time));
+
+             matrix.rotateY(0.75*Math.sin(0.5*time)+0.25);
+             matrix.rotateX(0.75*Math.sin(0.5*time)+0.25);
+
+             //matrix.rotateZ(3*Math.sin(0.25));
+
+            // square();
+
+
+      /// CUBE
+
+      /// PARAMETRIC EQUATIONS
+         var cylinder = function(u,v){
+            var vertices=[];
+            var x, y, z;
+            for (var i = 0; i < v; i++){
+               var line = [];
+               y = 2*i/v - 1 ;
+               for (var j=0; j<u; j++){
+                  x = Math.cos(2*pi*j/u)
+                  z = Math.sin(2*pi*j/u)     
+                  line.push(new Vector3(x,y,z));
+               }
+      
+            vertices.push(line);
+            //console.log(vertices);
+
+            }
+
+            for( var i =0; i < u; i++){ 
+               for( var j = 0; j < v; j++){ 
+
+               //console.log(vertices[i][j].x);
+
+               
+               if (j < v - 1){
+                  startLine(vertices[i][j].x,vertices[i][j].y, vertices[i][j].z);
+                  // lineTo(vertices[i][j+1].x,vertices[i][j+1].y, vertices[i][j+1].z);
+                  tackText("🖕",vertices[i][j+1].x,vertices[i][j+1].y, vertices[i][j+1].z);
+                  context.stroke();
+               }else{
+                  context.stroke(); 
+               }
+               //  
+               }
+
+            
+            }
+            
+         }  
+      
+        
+         //cylinder(10,10);
+
+   var wave = function(u,v){
+      var vertices=[];
+      var x, y, z;
+         for (var i = 0; i < v; i++){
+            var line = [];
+               for (var j=0; j<u; j++){
+                  x = 3* (i/u)- 1;
+                  y = 3* (j/v)- 1;
+                  r = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+                  z = 0.05 * Math.cos(5 *r + (time*10));   
+                  line.push(new Vector3(x,y,z));
+               }
+      
+            vertices.push(line);
+
+            }
+
+            for( var i =0; i < u; i++){ 
+               for( var j = 0; j < v; j++){ 
+
+               //console.log(vertices[i][j].x);
+
+               
+               if (j < v - 1){
+
+                  startLine(vertices[i][j].x,vertices[i][j].y, vertices[i][j].z);
+ 
+                  // lineTo(vertices[i][j+1].x,vertices[i][j+1].y, vertices[i][j+1].z);
+
+                  tackText("👋",vertices[i][j+1].x,vertices[i][j+1].y, vertices[i][j+1].z);
+
+                  context.stroke();
+               }else{
+                  context.stroke(); 
+               }
+               //  
+               }
+
+            
+            }
+            
+         }             
+
+         wave(20,20);
+
+
+   }
+
+   console.log('initial + '  +  matrix);
+
+
+
+
+
+
+
+
+
+</script>
+</html>
